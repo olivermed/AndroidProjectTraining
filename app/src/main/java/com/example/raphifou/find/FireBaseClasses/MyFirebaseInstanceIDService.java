@@ -3,8 +3,10 @@ package com.example.raphifou.find.FireBaseClasses;
 /**
  * Created by oliviermedec on 09/05/2017.
  */
+import android.content.SharedPreferences;
 import android.util.Log;
 
+import com.example.raphifou.find.R;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
 
@@ -41,6 +43,10 @@ public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService {
      * @param token The new token.
      */
     private void sendRegistrationToServer(String token) {
-        // TODO: Implement this method to send token to your app server.
+        SharedPreferences sharedPref = getSharedPreferences(
+                getString(R.string.preference_file_key), MODE_PRIVATE);
+
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(getString(R.string.token), token);
     }
 }

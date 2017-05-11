@@ -21,8 +21,7 @@ import retrofit2.Response;
 
 public class Loginactivity extends AppCompatActivity {
     public static String Tag = Loginactivity.class.getSimpleName();
-    SharedPreferences sharedPref = getSharedPreferences(
-            getString(R.string.preference_file_key), MODE_PRIVATE);
+    SharedPreferences sharedPref = null;
     public EditText txtLogin;
     public EditText txtPassword;
 
@@ -33,6 +32,8 @@ public class Loginactivity extends AppCompatActivity {
 
         txtLogin = (EditText) findViewById(R.id.txtLogin);
         txtPassword  = (EditText)findViewById(R.id.txtPassword);
+
+        sharedPref = getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE);
 
         setInputs();
 
@@ -85,14 +86,16 @@ public class Loginactivity extends AppCompatActivity {
     }
 
     private void setInputs() {
-        String login = sharedPref.getString(getString(R.string.login), null);
-        String pwd = sharedPref.getString(getString(R.string.login), null);
+        if (sharedPref != null) {
+            String login = sharedPref.getString(getString(R.string.login), null);
+            String pwd = sharedPref.getString(getString(R.string.login), null);
 
-        if (login != null) {
-            txtLogin.setText(login);
-        }
-        if (pwd != null) {
-            txtPassword.setText(pwd);
+            if (login != null) {
+                txtLogin.setText(login);
+            }
+            if (pwd != null) {
+                txtPassword.setText(pwd);
+            }
         }
     }
 }

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+        <RelativeLayout android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+            android:id="@+id/container">
+            <ImageView
+                android:id="@+id/image_view"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_margin="8dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/txtLogin"
+                android:text="OlivierMedec"
+                android:layout_alignBottom="@+id/image_view"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="18dp" />
+        </RelativeLayout>
+</android.support.v7.widget.CardView>

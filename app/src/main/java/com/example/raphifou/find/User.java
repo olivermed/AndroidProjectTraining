@@ -5,9 +5,17 @@ package com.example.raphifou.find;
  */
 
 public class User {
-    String FirstName;
-    String Surname;
-    String Login;
-    String Password;
-    String token;
+    public String FirstName;
+    public String Surname;
+    public String Login;
+    public String Password;
+    public String idFcm;
+
+    public User(String FirstName, String Surname, String Login, String Password,String idFcm) {
+        this.FirstName = FirstName;
+        this.Surname = Surname;
+        this.Login = Login;
+        this.Password = Password;
+        this.idFcm = idFcm;
+    }
 }

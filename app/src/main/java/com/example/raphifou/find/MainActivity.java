@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -16,6 +17,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.example.raphifou.find.Fragment.ContactFragment;
 import com.google.firebase.iid.FirebaseInstanceId;
 
 public class MainActivity extends AppCompatActivity
@@ -55,7 +57,7 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        Log.w(this.getPackageName(), FirebaseInstanceId.getInstance().getToken());
+        //Log.w(this.getPackageName(), FirebaseInstanceId.getInstance().getToken());
     }
 
     @Override
@@ -96,14 +98,8 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
+        if (id == R.id.nav_contact) {
+            setFragment(new ContactFragment(), ContactFragment.Tag);
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {
@@ -113,5 +109,27 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void setFragment(Fragment fragment, String Tag) {
+        int entry = getSupportFragmentManager().getBackStackEntryCount();
+        String fragmentName = null;
+
+        if (entry > 0) {
+            fragmentName = getSupportFragmentManager().getBackStackEntryAt(entry - 1).getName();
+            if (fragmentName != Tag) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, fragment, Tag)
+                        .addToBackStack(Tag)
+                        .commit();
+            }
+        } else {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, fragment, Tag)
+                    .addToBackStack(Tag)
+                    .commit();
+        }
+        System.out.println("Fragment name :: " + fragmentName);
+        Log.w("Number of entry::", "" + entry);
     }
 }
