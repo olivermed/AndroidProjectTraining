@@ -1,5 +1,7 @@
 package com.example.raphifou.find;
 
+import android.content.DialogInterface;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -44,19 +46,43 @@ public class RegisterActivity extends AppCompatActivity {
                 final String Password = registerPassword.getText().toString();
                 final String ConfirmPassword = registerConfirmPassword.getText().toString();
 
-                Call<mainResponseObject> call = service.register(Login, Surname, Firstname, Password, FirebaseInstanceId.getInstance().getToken());
-                call.enqueue(new Callback<mainResponseObject>() {
-                    @Override
-                    public void onResponse(Call<mainResponseObject> call, Response<mainResponseObject> response) {
-                        Log.w(Tag, "Registered");
-                        finish();
-                    }
+                if (Password.equals(ConfirmPassword)) {
+                    Log.d(Tag,"succeed");
+                    Call<mainResponseObject> call = service.register(Login, Surname, Firstname, Password, FirebaseInstanceId.getInstance().getToken());
+                    call.enqueue(new Callback<mainResponseObject>() {
+                        @Override
+                        public void onResponse(Call<mainResponseObject> call, Response<mainResponseObject> response) {
+                            Log.w(Tag, "Registered");
+                            AlertDialog alertDialog = new AlertDialog.Builder(RegisterActivity.this).create();
+                            alertDialog.setTitle("Registered succedd");
+                            alertDialog.setMessage("you registered successfully");
+                            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.dismiss();
+                                        }
+                                    });
+                            alertDialog.show();
+                            finish();
+                        }
 
-                    @Override
-                    public void onFailure(Call<mainResponseObject> call, Throwable t) {
-                        Log.e(Tag, t.toString());
-                    }
-                });
+                        @Override
+                        public void onFailure(Call<mainResponseObject> call, Throwable t) {
+                            Log.e(Tag, t.toString());
+                        }
+                    });
+                }else{
+                    AlertDialog alertDialog = new AlertDialog.Builder(RegisterActivity.this).create();
+                    alertDialog.setTitle("Alert password");
+                    alertDialog.setMessage("Password not matching");
+                    alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+                    alertDialog.show();
+                }
             }
         });
     }

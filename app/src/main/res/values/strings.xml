@@ -12,6 +12,8 @@
 
     <string name="action_settings">Settings</string>
 
+    <string name="first_cardview">My Location</string>
+    <string name="second_cardview">Friends location</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
