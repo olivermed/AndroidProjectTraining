@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">Find</string>
     <string name="title_activity_main">MainActivity</string>
+    <string name="login">login</string>
+    <string name="password">password</string>
+    <string name="token">token</string>
+    <string name="preference_file_key">preference_file_key</string>
 </resources>

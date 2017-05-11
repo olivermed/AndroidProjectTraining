@@ -1,4 +1,4 @@
-package com.example.raphifou.find.Class;
+package com.example.raphifou.find.FireBaseClasses;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
