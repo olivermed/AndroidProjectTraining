@@ -1,13 +1,13 @@
 package com.example.raphifou.find;
 
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+/**
+ * Created by oliviermedec on 11/05/2017.
+ */
 
-public class User extends AppCompatActivity {
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_user);
-    }
+public class User {
+    String FirstName;
+    String Surname;
+    String Login;
+    String Password;
+    String token;
 }
