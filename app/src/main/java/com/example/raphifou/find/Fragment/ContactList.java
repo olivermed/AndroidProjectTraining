@@ -86,7 +86,7 @@ public class ContactList extends RecyclerView.Adapter<ContactList.ViewHolder>  {
                 if (type == 0) {
                     new MaterialDialog.Builder(context)
                             .title(users.get(position).Login)
-                            .content("Do you want to share or ask location with " + users.get(position).Login)
+                            .content("Do you want to share or ask location with " + users.get(position).Login + " ?")
                             .positiveText("Share")
                             .negativeText("Ask")
                             .onPositive(new MaterialDialog.SingleButtonCallback() {
@@ -131,49 +131,92 @@ public class ContactList extends RecyclerView.Adapter<ContactList.ViewHolder>  {
                                 }
                             })
                             .show();
-                } else if (type == 1) {
-                    BackEndApiService service = ApiBackFireBase.getClientFireBase().create(BackEndApiService.class);
-                    Call<FireBaseResponse> call = service.sendMsgtToUser("application/json",
-                            "key=AAAAYeZt82k:APA91bGQwNoUkZybkScveS_-koc2I6ySW9_9BXJBAKEN6t43Xs8S2diVxXp-5ERdYYSuj17QpUMc5rwINFDbjIyidzLYuw-2uNl5Qx1CSjrPqxFrDCPIzxCkxYSCBLg_5S5X6P4nCuXS",
-                            new FireBaseObject(users.get(position).idFcm, login, "Watch the location of " + login, 0, idFcm, users.get(position)._id, users.get(position).Login, latitude, longitude));
-                    call.enqueue(new Callback<FireBaseResponse>() {
-                        @Override
-                        public void onResponse(Call<FireBaseResponse> call, Response<FireBaseResponse> response) {
-                            Log.w(context.getPackageName(), response.toString());
-                            new MaterialDialog.Builder(context)
-                                    .title(users.get(position).Login)
-                                    .content("Your location have been shared with " + users.get(position).Login)
-                                    .positiveText("Ok")
-                                    .show();
-                        }
+                } else if (type == 1) { // Share
+                    new MaterialDialog.Builder(context)
+                            .title(users.get(position).Login)
+                            .content("Do you want to share with " + users.get(position).Login + " ?")
+                            .positiveText("Yes")
+                            .negativeText("No")
+                            .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                    shareToUser(position, login, idFcm);
+                                }
+                            })
+                            .onNegative(new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
 
-                        @Override
-                        public void onFailure(Call<FireBaseResponse> call, Throwable t) {
-                            Log.e(context.getPackageName(), t.toString());
-                        }
-                    });
-                } else if (type == 2) {
-                    BackEndApiService service = ApiBackFireBase.getClientFireBase().create(BackEndApiService.class);
-                    Call<FireBaseResponse> call = service.sendMsgtToUser("application/json",
-                            "key=AAAAYeZt82k:APA91bGQwNoUkZybkScveS_-koc2I6ySW9_9BXJBAKEN6t43Xs8S2diVxXp-5ERdYYSuj17QpUMc5rwINFDbjIyidzLYuw-2uNl5Qx1CSjrPqxFrDCPIzxCkxYSCBLg_5S5X6P4nCuXS",
-                            new FireBaseObject(users.get(position).idFcm, login, "Share your location with " + login, 1, idFcm, users.get(position)._id, users.get(position).Login, latitude, longitude));
-                    call.enqueue(new Callback<FireBaseResponse>() {
-                        @Override
-                        public void onResponse(Call<FireBaseResponse> call, Response<FireBaseResponse> response) {
-                            Log.w(context.getPackageName(), response.toString());
-                            new MaterialDialog.Builder(context)
-                                    .title(users.get(position).Login)
-                                    .content("You ask the location to " + users.get(position).Login)
-                                    .positiveText("Ok")
-                                    .show();
-                        }
+                                }
+                            })
+                            .show();
+                } else if (type == 2) { // Ask
+                    new MaterialDialog.Builder(context)
+                            .title(users.get(position).Login)
+                            .content("Do you want to ask " + users.get(position).Login + "'s location ?")
+                            .positiveText("Yes")
+                            .negativeText("No")
+                            .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                    askToUser(position, login, idFcm);
+                                }
+                            })
+                            .onNegative(new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
 
-                        @Override
-                        public void onFailure(Call<FireBaseResponse> call, Throwable t) {
-                            Log.e(context.getPackageName(), t.toString());
-                        }
-                    });
+                                }
+                            })
+                            .show();
+
                 }
+            }
+        });
+    }
+
+    public void shareToUser(final int position, String login, String idFcm) {
+        BackEndApiService service = ApiBackFireBase.getClientFireBase().create(BackEndApiService.class);
+        Call<FireBaseResponse> call = service.sendMsgtToUser("application/json",
+                "key=AAAAYeZt82k:APA91bGQwNoUkZybkScveS_-koc2I6ySW9_9BXJBAKEN6t43Xs8S2diVxXp-5ERdYYSuj17QpUMc5rwINFDbjIyidzLYuw-2uNl5Qx1CSjrPqxFrDCPIzxCkxYSCBLg_5S5X6P4nCuXS",
+                new FireBaseObject(users.get(position).idFcm, login, "Watch the location of " + login, 0, idFcm, users.get(position)._id, users.get(position).Login, latitude, longitude));
+        call.enqueue(new Callback<FireBaseResponse>() {
+            @Override
+            public void onResponse(Call<FireBaseResponse> call, Response<FireBaseResponse> response) {
+                Log.w(context.getPackageName(), response.toString());
+                new MaterialDialog.Builder(context)
+                        .title(users.get(position).Login)
+                        .content("Your location have been shared with " + users.get(position).Login)
+                        .positiveText("Ok")
+                        .show();
+            }
+
+            @Override
+            public void onFailure(Call<FireBaseResponse> call, Throwable t) {
+                Log.e(context.getPackageName(), t.toString());
+            }
+        });
+    }
+
+    public void askToUser(final int position, String login, String idFcm) {
+        BackEndApiService service = ApiBackFireBase.getClientFireBase().create(BackEndApiService.class);
+        Call<FireBaseResponse> call = service.sendMsgtToUser("application/json",
+                "key=AAAAYeZt82k:APA91bGQwNoUkZybkScveS_-koc2I6ySW9_9BXJBAKEN6t43Xs8S2diVxXp-5ERdYYSuj17QpUMc5rwINFDbjIyidzLYuw-2uNl5Qx1CSjrPqxFrDCPIzxCkxYSCBLg_5S5X6P4nCuXS",
+                new FireBaseObject(users.get(position).idFcm, login, "Share your location with " + login, 1, idFcm, users.get(position)._id, users.get(position).Login, latitude, longitude));
+        call.enqueue(new Callback<FireBaseResponse>() {
+            @Override
+            public void onResponse(Call<FireBaseResponse> call, Response<FireBaseResponse> response) {
+                Log.w(context.getPackageName(), response.toString());
+                new MaterialDialog.Builder(context)
+                        .title(users.get(position).Login)
+                        .content("You ask the location to " + users.get(position).Login)
+                        .positiveText("Ok")
+                        .show();
+            }
+
+            @Override
+            public void onFailure(Call<FireBaseResponse> call, Throwable t) {
+                Log.e(context.getPackageName(), t.toString());
             }
         });
     }
