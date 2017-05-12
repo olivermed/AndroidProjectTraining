@@ -1,9 +1,11 @@
 package com.example.raphifou.find.Fragment;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,10 +18,10 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.example.raphifou.find.R;
-import com.example.raphifou.find.Retrofit.ApiBackend;
+import com.example.raphifou.find.Retrofit.ApiBackFireBase;
 import com.example.raphifou.find.Retrofit.BackEndApiService;
+import com.example.raphifou.find.Retrofit.FireBaseObject;
 import com.example.raphifou.find.Retrofit.FireBaseResponse;
-import com.example.raphifou.find.Retrofit.UsersResponse;
 import com.example.raphifou.find.User;
 
 import java.util.List;
@@ -27,6 +29,8 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import static android.content.Context.MODE_PRIVATE;
 
 /**
  * Created by oliviermedec on 11/05/2017.
@@ -59,6 +63,15 @@ public class ContactList extends RecyclerView.Adapter<ContactList.ViewHolder>  {
                 .buildRound(String.valueOf(users.get(position).Login.charAt(0)),
                         generator.getColor(users.get(position).Login));
         holder.imgBubble.setImageDrawable(drawable);
+
+        SharedPreferences sharedPref = context.getSharedPreferences(
+                context.getString(R.string.preference_file_key), MODE_PRIVATE);
+        final String login = sharedPref.getString(context.getString(R.string.login), null);
+        final String idFcm = sharedPref.getString(context.getString(R.string.idFcm), null);
+
+
+
+
         holder.container.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -71,17 +84,20 @@ public class ContactList extends RecyclerView.Adapter<ContactList.ViewHolder>  {
                             .onPositive(new MaterialDialog.SingleButtonCallback() {
                                 @Override
                                 public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                    final BackEndApiService service = ApiBackend.getClientFireBase().create(BackEndApiService.class);
-                                    Call<FireBaseResponse> call = service.sendMsgtToUser("application/json", "key=AAAAYeZt82k:APA91bGQwNoUkZybkScveS_-koc2I6ySW9_9BXJBAKEN6t43Xs8S2diVxXp-5ERdYYSuj17QpUMc5rwINFDbjIyidzLYuw-2uNl5Qx1CSjrPqxFrDCPIzxCkxYSCBLg_5S5X6P4nCuXS");
+                                    //get my position and send it
+                                    BackEndApiService service = ApiBackFireBase.getClientFireBase().create(BackEndApiService.class);
+                                    Call<FireBaseResponse> call = service.sendMsgtToUser("application/json",
+                                            "key=AAAAYeZt82k:APA91bGQwNoUkZybkScveS_-koc2I6ySW9_9BXJBAKEN6t43Xs8S2diVxXp-5ERdYYSuj17QpUMc5rwINFDbjIyidzLYuw-2uNl5Qx1CSjrPqxFrDCPIzxCkxYSCBLg_5S5X6P4nCuXS",
+                                            new FireBaseObject(users.get(position).idFcm, login, "Watch the location of " + login, 0, idFcm, users.get(position)._id, users.get(position).Login));
                                     call.enqueue(new Callback<FireBaseResponse>() {
                                         @Override
                                         public void onResponse(Call<FireBaseResponse> call, Response<FireBaseResponse> response) {
-
+                                            Log.w(context.getPackageName(), response.toString());
                                         }
 
                                         @Override
                                         public void onFailure(Call<FireBaseResponse> call, Throwable t) {
-
+                                            Log.e(context.getPackageName(), t.toString());
                                         }
                                     });
                                 }
@@ -89,7 +105,21 @@ public class ContactList extends RecyclerView.Adapter<ContactList.ViewHolder>  {
                             .onNegative(new MaterialDialog.SingleButtonCallback() {
                                 @Override
                                 public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                    // TODO
+                                    BackEndApiService service = ApiBackFireBase.getClientFireBase().create(BackEndApiService.class);
+                                    Call<FireBaseResponse> call = service.sendMsgtToUser("application/json",
+                                            "key=AAAAYeZt82k:APA91bGQwNoUkZybkScveS_-koc2I6ySW9_9BXJBAKEN6t43Xs8S2diVxXp-5ERdYYSuj17QpUMc5rwINFDbjIyidzLYuw-2uNl5Qx1CSjrPqxFrDCPIzxCkxYSCBLg_5S5X6P4nCuXS",
+                                            new FireBaseObject(users.get(position).idFcm, login, "Share your location with " + login, 1, idFcm, users.get(position)._id, users.get(position).Login));
+                                    call.enqueue(new Callback<FireBaseResponse>() {
+                                        @Override
+                                        public void onResponse(Call<FireBaseResponse> call, Response<FireBaseResponse> response) {
+                                            Log.w(context.getPackageName(), response.toString());
+                                        }
+
+                                        @Override
+                                        public void onFailure(Call<FireBaseResponse> call, Throwable t) {
+                                            Log.e(context.getPackageName(), t.toString());
+                                        }
+                                    });
                                 }
                             })
                             .show();

@@ -48,8 +48,12 @@ public class RegisterActivity extends AppCompatActivity {
                 call.enqueue(new Callback<mainResponseObject>() {
                     @Override
                     public void onResponse(Call<mainResponseObject> call, Response<mainResponseObject> response) {
-                        Log.w(Tag, "Registered");
-                        finish();
+                        if (response.code() == 200) {
+                            Log.w(Tag, "Registered");
+                            finish();
+                        } else {
+                            Log.w(Tag, "Registered failed");
+                        }
                     }
 
                     @Override

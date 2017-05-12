@@ -5,8 +5,13 @@ package com.example.raphifou.find.Retrofit;
  */
 
 public class FireBaseResponse {
-    String   multicast_id;
-    String   success;
-    String   failure;
-    String   canonical_ids;
+    public String   multicast_id;
+    public String   success;
+    public String   failure;
+    public String   canonical_ids;
+    /*public Results  results;
+
+    public class Results {
+        public String error;
+    }*/
 }

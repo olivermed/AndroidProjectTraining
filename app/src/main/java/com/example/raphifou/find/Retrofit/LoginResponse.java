@@ -6,6 +6,7 @@ package com.example.raphifou.find.Retrofit;
 
 public class LoginResponse {
     public String token;
+    public String _id;
 
     public LoginResponse getResult() {
         return this;

@@ -4,20 +4,22 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
- * Created by oliviermedec on 11/05/2017.
+ * Created by oliviermedec on 12/05/2017.
  */
 
-public class ApiBackend {
-    public static final String BASE_URL = "https://apiprojecttraining.herokuapp.com/";
+public class ApiBackFireBase {
+
+    public static final String BASE_URL_FIREBASE = "https://fcm.googleapis.com/";
     private static Retrofit retrofit = null;
 
-    public static Retrofit getClient() {
+    public static Retrofit getClientFireBase() {
         if (retrofit == null) {
             retrofit = new Retrofit.Builder()
-                    .baseUrl(BASE_URL)
+                    .baseUrl(BASE_URL_FIREBASE)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
         }
         return retrofit;
+
     }
 }
