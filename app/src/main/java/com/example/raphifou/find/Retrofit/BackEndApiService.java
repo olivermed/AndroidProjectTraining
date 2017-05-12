@@ -34,6 +34,6 @@ public interface BackEndApiService {
     Call<FireBaseResponse> sendMsgtToUser(@Header("Content-Type") String contentType,
                                           @Header("Authorization") String key, @Body FireBaseObject obj);
     @GET("getUser/{id}")
-    Call<UsersResponse> getUser(@Header("x-access-token") String token, @Path("id") String id);
+    Call<UserResponse> getUser(@Header("x-access-token") String token, @Path("id") String id);
 
 }

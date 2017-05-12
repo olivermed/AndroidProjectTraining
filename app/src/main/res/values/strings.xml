@@ -19,6 +19,8 @@
     <string name="ask_location_cardvoew_title">Friends location</string>
     <string name="TitleHome">Home</string>
     <string name="TitleContact">Contact</string>
+    <string name="UserName">UserName</string>
+    <string name="UserSurname">UserSurname</string>
 
     <string name="share_desc">Share your location with your friends. Let them know where you are.</string>
     <string name="ask_desc">Ask your fiend there location, if you want to know where they are.</string>

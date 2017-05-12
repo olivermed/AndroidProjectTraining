@@ -54,10 +54,11 @@ public class Loginactivity extends AppCompatActivity {
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                LoginObject loginObject = new LoginObject(txtLogin.getText().toString(), txtPassword.getText().toString());
+                final LoginObject loginObject = new LoginObject(txtLogin.getText().toString(), txtPassword.getText().toString());
 
                 if (txtLogin.getText() != null || txtPassword.getText() != null) {
                     Call<LoginResponse> call = service.login(loginObject.Login, loginObject.Password);
+
 
                     call.enqueue(new Callback<LoginResponse>() {
                         @Override
@@ -91,10 +92,15 @@ public class Loginactivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public void onBackPressed() {
+        moveTaskToBack(true);
+    }
+
     private void setInputs() {
         if (sharedPref != null) {
             String login = sharedPref.getString(getString(R.string.login), null);
-            String pwd = sharedPref.getString(getString(R.string.login), null);
+            String pwd = sharedPref.getString(getString(R.string.password), null);
 
             if (login != null) {
                 txtLogin.setText(login);

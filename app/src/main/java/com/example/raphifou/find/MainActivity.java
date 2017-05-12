@@ -19,6 +19,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 import com.example.raphifou.find.Fragment.ContactFragment;
 import com.example.raphifou.find.GPS.GPSTracker;
@@ -36,6 +37,8 @@ public class MainActivity extends AppCompatActivity
 
     private static final int MY_PERMISSIONS_REQUEST_READ_LOCATION = 0;
     NavigationView navigationView = null;
+    TextView txtUserName = null;
+    TextView txtUserLogin = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,15 +74,6 @@ public class MainActivity extends AppCompatActivity
                     .commit();
         }
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -88,6 +82,10 @@ public class MainActivity extends AppCompatActivity
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        View headerLayout = navigationView.getHeaderView(0);
+        TextView txtUserName = (TextView) headerLayout.findViewById(R.id.txtUserName);
+        txtUserName.setText(sharedPref.getString(getString(R.string.login), null));
 
         if (FirebaseInstanceId.getInstance().getToken() != null) {
             SharedPreferences.Editor editor = sharedPref.edit();
@@ -184,6 +182,9 @@ public class MainActivity extends AppCompatActivity
             setFragment(new ContactFragment(), ContactFragment.Tag);
         } else if (id == R.id.nav_home) {
             setFragment(new Home(), Home.Tag);
+        } else if (id == R.id.nav_disconnect) {
+            Intent intent = new Intent(this, Loginactivity.class);
+            startActivity(intent);
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {
