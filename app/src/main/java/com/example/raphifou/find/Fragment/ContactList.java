@@ -17,6 +17,8 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
+import com.example.raphifou.find.CheckAuth;
+import com.example.raphifou.find.GPS.GPSTracker;
 import com.example.raphifou.find.R;
 import com.example.raphifou.find.Retrofit.ApiBackFireBase;
 import com.example.raphifou.find.Retrofit.BackEndApiService;
@@ -41,6 +43,8 @@ public class ContactList extends RecyclerView.Adapter<ContactList.ViewHolder>  {
     Context context = null;
     ColorGenerator generator = ColorGenerator.MATERIAL;
     int type = 0;
+    public String longitude = null;
+    public String latitude = null;
 
     public ContactList(List<User> users, Context context, int type) {
         this.users =  users;
@@ -69,8 +73,12 @@ public class ContactList extends RecyclerView.Adapter<ContactList.ViewHolder>  {
         final String login = sharedPref.getString(context.getString(R.string.login), null);
         final String idFcm = sharedPref.getString(context.getString(R.string.idFcm), null);
 
-
-
+        GPSTracker gps = new GPSTracker(context);
+        if (gps.canGetLocation()){
+            latitude = ""+gps.getLatitude(); // returns latitude
+            longitude = ""+gps.getLongitude();
+        }
+        gps.stopUsingGPS();
 
         holder.container.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -88,7 +96,7 @@ public class ContactList extends RecyclerView.Adapter<ContactList.ViewHolder>  {
                                     BackEndApiService service = ApiBackFireBase.getClientFireBase().create(BackEndApiService.class);
                                     Call<FireBaseResponse> call = service.sendMsgtToUser("application/json",
                                             "key=AAAAYeZt82k:APA91bGQwNoUkZybkScveS_-koc2I6ySW9_9BXJBAKEN6t43Xs8S2diVxXp-5ERdYYSuj17QpUMc5rwINFDbjIyidzLYuw-2uNl5Qx1CSjrPqxFrDCPIzxCkxYSCBLg_5S5X6P4nCuXS",
-                                            new FireBaseObject(users.get(position).idFcm, login, "Watch the location of " + login, 0, idFcm, users.get(position)._id, users.get(position).Login));
+                                            new FireBaseObject(users.get(position).idFcm, login, "Watch the location of " + login, 0, idFcm, users.get(position)._id, users.get(position).Login, latitude, longitude));
                                     call.enqueue(new Callback<FireBaseResponse>() {
                                         @Override
                                         public void onResponse(Call<FireBaseResponse> call, Response<FireBaseResponse> response) {
@@ -108,7 +116,7 @@ public class ContactList extends RecyclerView.Adapter<ContactList.ViewHolder>  {
                                     BackEndApiService service = ApiBackFireBase.getClientFireBase().create(BackEndApiService.class);
                                     Call<FireBaseResponse> call = service.sendMsgtToUser("application/json",
                                             "key=AAAAYeZt82k:APA91bGQwNoUkZybkScveS_-koc2I6ySW9_9BXJBAKEN6t43Xs8S2diVxXp-5ERdYYSuj17QpUMc5rwINFDbjIyidzLYuw-2uNl5Qx1CSjrPqxFrDCPIzxCkxYSCBLg_5S5X6P4nCuXS",
-                                            new FireBaseObject(users.get(position).idFcm, login, "Share your location with " + login, 1, idFcm, users.get(position)._id, users.get(position).Login));
+                                            new FireBaseObject(users.get(position).idFcm, login, "Share your location with " + login, 1, idFcm, users.get(position)._id, users.get(position).Login, latitude, longitude));
                                     call.enqueue(new Callback<FireBaseResponse>() {
                                         @Override
                                         public void onResponse(Call<FireBaseResponse> call, Response<FireBaseResponse> response) {
@@ -124,9 +132,47 @@ public class ContactList extends RecyclerView.Adapter<ContactList.ViewHolder>  {
                             })
                             .show();
                 } else if (type == 1) {
+                    BackEndApiService service = ApiBackFireBase.getClientFireBase().create(BackEndApiService.class);
+                    Call<FireBaseResponse> call = service.sendMsgtToUser("application/json",
+                            "key=AAAAYeZt82k:APA91bGQwNoUkZybkScveS_-koc2I6ySW9_9BXJBAKEN6t43Xs8S2diVxXp-5ERdYYSuj17QpUMc5rwINFDbjIyidzLYuw-2uNl5Qx1CSjrPqxFrDCPIzxCkxYSCBLg_5S5X6P4nCuXS",
+                            new FireBaseObject(users.get(position).idFcm, login, "Watch the location of " + login, 0, idFcm, users.get(position)._id, users.get(position).Login, latitude, longitude));
+                    call.enqueue(new Callback<FireBaseResponse>() {
+                        @Override
+                        public void onResponse(Call<FireBaseResponse> call, Response<FireBaseResponse> response) {
+                            Log.w(context.getPackageName(), response.toString());
+                            new MaterialDialog.Builder(context)
+                                    .title(users.get(position).Login)
+                                    .content("Your location have been shared with " + users.get(position).Login)
+                                    .positiveText("Ok")
+                                    .show();
+                        }
 
+                        @Override
+                        public void onFailure(Call<FireBaseResponse> call, Throwable t) {
+                            Log.e(context.getPackageName(), t.toString());
+                        }
+                    });
                 } else if (type == 2) {
+                    BackEndApiService service = ApiBackFireBase.getClientFireBase().create(BackEndApiService.class);
+                    Call<FireBaseResponse> call = service.sendMsgtToUser("application/json",
+                            "key=AAAAYeZt82k:APA91bGQwNoUkZybkScveS_-koc2I6ySW9_9BXJBAKEN6t43Xs8S2diVxXp-5ERdYYSuj17QpUMc5rwINFDbjIyidzLYuw-2uNl5Qx1CSjrPqxFrDCPIzxCkxYSCBLg_5S5X6P4nCuXS",
+                            new FireBaseObject(users.get(position).idFcm, login, "Share your location with " + login, 1, idFcm, users.get(position)._id, users.get(position).Login, latitude, longitude));
+                    call.enqueue(new Callback<FireBaseResponse>() {
+                        @Override
+                        public void onResponse(Call<FireBaseResponse> call, Response<FireBaseResponse> response) {
+                            Log.w(context.getPackageName(), response.toString());
+                            new MaterialDialog.Builder(context)
+                                    .title(users.get(position).Login)
+                                    .content("You ask the location to " + users.get(position).Login)
+                                    .positiveText("Ok")
+                                    .show();
+                        }
 
+                        @Override
+                        public void onFailure(Call<FireBaseResponse> call, Throwable t) {
+                            Log.e(context.getPackageName(), t.toString());
+                        }
+                    });
                 }
             }
         });

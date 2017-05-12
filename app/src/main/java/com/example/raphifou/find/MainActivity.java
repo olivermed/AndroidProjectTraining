@@ -3,9 +3,7 @@ package com.example.raphifou.find;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.nfc.Tag;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -21,9 +19,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.example.raphifou.find.Fragment.ContactFragment;
+import com.example.raphifou.find.GPS.GPSTracker;
 import com.example.raphifou.find.Retrofit.ApiBackend;
 import com.example.raphifou.find.Retrofit.BackEndApiService;
 import com.example.raphifou.find.Retrofit.mainResponseObject;
@@ -33,20 +31,11 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.location.LocationProvider;
-
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener{
 
-    private LocationManager lm;
-
-    private double latitude;
-    private double longitude;
-    private double altitude;
-    private float accuracy;
+    private static final int MY_PERMISSIONS_REQUEST_READ_LOCATION = 0;
+    NavigationView navigationView = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +53,24 @@ public class MainActivity extends AppCompatActivity
             startActivity(intent);
         }
 
+        if (ContextCompat.checkSelfPermission(this,
+                android.Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+
+                // No explanation needed, we can request the permission.
+                ActivityCompat.requestPermissions(this,
+                        new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                        MY_PERMISSIONS_REQUEST_READ_LOCATION);
+        }
+
+        if(savedInstanceState == null) {
+            Fragment home = Home.newInstance(null, null);
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, home, home.getTag())
+                    .addToBackStack(home.getTag())
+                    .commit();
+        }
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -79,7 +86,7 @@ public class MainActivity extends AppCompatActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         if (FirebaseInstanceId.getInstance().getToken() != null) {
@@ -103,6 +110,35 @@ public class MainActivity extends AppCompatActivity
                     Log.e(getPackageName(), t.toString());
                 }
             });
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_READ_LOCATION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    GPSTracker gps = new GPSTracker(this);
+                    if (gps.canGetLocation()){
+                        gps.getLatitude(); // returns latitude
+                        gps.getLongitude();
+                    }
+                    gps.stopUsingGPS();
+
+                } else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
         }
     }
 
@@ -146,6 +182,8 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_contact) {
             setFragment(new ContactFragment(), ContactFragment.Tag);
+        } else if (id == R.id.nav_home) {
+            setFragment(new Home(), Home.Tag);
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {
@@ -157,7 +195,7 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    private void setFragment(Fragment fragment, String Tag) {
+    public void setFragment(Fragment fragment, String Tag) {
         int entry = getSupportFragmentManager().getBackStackEntryCount();
         String fragmentName = null;
 
@@ -177,5 +215,9 @@ public class MainActivity extends AppCompatActivity
         }
         System.out.println("Fragment name :: " + fragmentName);
         Log.w("Number of entry::", "" + entry);
+    }
+
+    public void setAppBarMenu(int id) {
+        navigationView.setCheckedItem(id);
     }
 }

@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import com.example.raphifou.find.GPS.GPSTracker;
 import com.example.raphifou.find.Retrofit.ApiBackFireBase;
 import com.example.raphifou.find.Retrofit.BackEndApiService;
 import com.example.raphifou.find.Retrofit.FireBaseObject;
@@ -24,6 +25,8 @@ public class CheckAuth extends AppCompatActivity {
     public String sendingFcm = null;
     public String loginUser = null;
     public String idUser = null;
+    public String longitude = null;
+    public String latitude = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,14 +54,20 @@ public class CheckAuth extends AppCompatActivity {
                 String id = sharedPref.getString(getString(R.string.id), null);
 
                 Log.w(getPackageName(), "My idFcm :: " + idFcm);
-                Log.w(getPackageName(), "User sefndingFcm :: " + idFcm
-                );
+                Log.w(getPackageName(), "User sefndingFcm :: " + idFcm);
                 Log.w(getPackageName(), "My login :: " + login);
+
+                GPSTracker gps = new GPSTracker(CheckAuth.this);
+                if (gps.canGetLocation()){
+                    latitude = ""+gps.getLatitude(); // returns latitude
+                    longitude = ""+gps.getLongitude();
+                }
+                gps.stopUsingGPS();
 
                 BackEndApiService service = ApiBackFireBase.getClientFireBase().create(BackEndApiService.class);
                 Call<FireBaseResponse> call = service.sendMsgtToUser("application/json",
                         "key=AAAAYeZt82k:APA91bGQwNoUkZybkScveS_-koc2I6ySW9_9BXJBAKEN6t43Xs8S2diVxXp-5ERdYYSuj17QpUMc5rwINFDbjIyidzLYuw-2uNl5Qx1CSjrPqxFrDCPIzxCkxYSCBLg_5S5X6P4nCuXS",
-                        new FireBaseObject(sendingFcm, login, "Here is the location of " + login, 0, idFcm, id, login));
+                        new FireBaseObject(sendingFcm, login, "Here is the location of " + login, 0, idFcm, id, login, latitude, longitude));
                 call.enqueue(new Callback<FireBaseResponse>() {
                     @Override
                     public void onResponse(Call<FireBaseResponse> call, Response<FireBaseResponse> response) {

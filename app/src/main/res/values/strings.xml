@@ -9,20 +9,29 @@
     <string name="idUser">idUser</string>
     <string name="loginUser">loginUser</string>
     <string name="id">id</string>
+    <string name="latitude">latitude</string>
+    <string name="longitude">longitude</string>
     <string name="provider_enabled">preference_file_key</string>
     <string name="provider_disabled">preference_file_key</string>
     <string name="preference_file_key">preference_file_key</string>
     <string name="title_activity_main2">Main2Activity</string>
+    <string name="share_location_cardvoew_title">My location</string>
+    <string name="ask_location_cardvoew_title">Friends location</string>
+    <string name="TitleHome">Home</string>
+    <string name="TitleContact">Contact</string>
+
+    <string name="share_desc">Share your location with your friends. Let them know where you are.</string>
+    <string name="ask_desc">Ask your fiend there location, if you want to know where they are.</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
 
-    <string name="first_cardview">My Location</string>
     <string name="second_cardview">Friends location</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_map">MapActivity</string>
     <string name="title_activity_check_auth">CheckAuth</string>
+    <string name="title_activity_maps">Map</string>
 </resources>

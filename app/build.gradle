@@ -37,8 +37,11 @@ dependencies {
     compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
     compile 'com.afollestad.material-dialogs:core:0.9.4.4'
     compile 'com.afollestad.material-dialogs:commons:0.9.4.4'
+    compile 'com.google.android.gms:play-services-maps:10.2.4'
     testCompile 'junit:junit:4.12'
 }
+
+
 
 
 

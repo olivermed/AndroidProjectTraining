@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.raphifou.find.MainActivity;
 import com.example.raphifou.find.R;
 import com.example.raphifou.find.Retrofit.ApiBackend;
 import com.example.raphifou.find.Retrofit.BackEndApiService;
@@ -40,11 +41,11 @@ public class ContactFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     public static String Tag = ContactFragment.class.toString();
-    private static final String ARG_PARAM1 = "param1";
+    private static final String ARG_PARAM1 = "type";
     private static final String ARG_PARAM2 = "param2";
 
     // TODO: Rename and change types of parameters
-    private String mParam1;
+    private String type;
     private String mParam2;
 
     private RecyclerView mRecyclerView;
@@ -61,15 +62,15 @@ public class ContactFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
+     * @param type Parameter 1.
      * @param param2 Parameter 2.
      * @return A new instance of fragment ContactFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static ContactFragment newInstance(String param1, String param2) {
+    public static ContactFragment newInstance(String type, String param2) {
         ContactFragment fragment = new ContactFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
+        args.putString(ARG_PARAM1, type);
         args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
@@ -79,7 +80,7 @@ public class ContactFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
+            type = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
@@ -111,7 +112,11 @@ public class ContactFragment extends Fragment {
             public void onResponse(Call<UsersResponse> call, Response<UsersResponse> response) {
                 Log.w(Tag, response.body().getResults().toString());
                 List<User> usersList = response.body().getResults();
-                mAdapter = new ContactList(usersList, getContext(), 0);
+                if (type != null) {
+                    mAdapter = new ContactList(usersList, getContext(), Integer.parseInt(type));
+                } else {
+                    mAdapter = new ContactList(usersList, getContext(), 0);
+                }
                 mRecyclerView.setAdapter(mAdapter);
             }
 
@@ -145,6 +150,17 @@ public class ContactFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        setAppBarMenu();
+    }
+
+    public void setAppBarMenu() {
+        ((MainActivity)getActivity()).setAppBarMenu(R.id.nav_contact);
+        getActivity().setTitle(getString(R.string.TitleContact));
     }
 
     /**
