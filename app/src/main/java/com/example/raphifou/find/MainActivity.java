@@ -33,12 +33,10 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener{
+        implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final int MY_PERMISSIONS_REQUEST_READ_LOCATION = 0;
     NavigationView navigationView = null;
-    TextView txtUserName = null;
-    TextView txtUserLogin = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
