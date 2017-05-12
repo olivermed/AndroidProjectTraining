@@ -7,8 +7,18 @@ import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.example.raphifou.find.R;
+import com.example.raphifou.find.Retrofit.ApiBackFireBase;
+import com.example.raphifou.find.Retrofit.ApiBackend;
+import com.example.raphifou.find.Retrofit.BackEndApiService;
+import com.example.raphifou.find.Retrofit.FireBaseObject;
+import com.example.raphifou.find.Retrofit.FireBaseResponse;
+import com.example.raphifou.find.Retrofit.mainResponseObject;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
 public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService {
@@ -47,6 +57,24 @@ public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService {
                 getString(R.string.preference_file_key), MODE_PRIVATE);
 
         SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString(getString(R.string.token), token);
+        editor.putString(getString(R.string.idFcm), token);
+        editor.commit();
+
+        String tokenUser = sharedPref.getString(getString(R.string.token), null);
+        String idUser = sharedPref.getString(getString(R.string.id), null);
+
+        BackEndApiService service = ApiBackend.getClient().create(BackEndApiService.class);
+        Call<mainResponseObject> call = service.addIdFcm(tokenUser, idUser, token);
+        call.enqueue(new Callback<mainResponseObject>() {
+            @Override
+            public void onResponse(Call<mainResponseObject> call, Response<mainResponseObject> response) {
+                Log.w(getPackageName(), response.toString());
+            }
+
+            @Override
+            public void onFailure(Call<mainResponseObject> call, Throwable t) {
+                Log.e(getPackageName(), t.toString());
+            }
+        });
     }
 }

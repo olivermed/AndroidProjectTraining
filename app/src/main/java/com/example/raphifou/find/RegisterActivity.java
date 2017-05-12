@@ -47,23 +47,26 @@ public class RegisterActivity extends AppCompatActivity {
                 final String ConfirmPassword = registerConfirmPassword.getText().toString();
 
                 if (Password.equals(ConfirmPassword)) {
-                    Log.d(Tag,"succeed");
                     Call<mainResponseObject> call = service.register(Login, Surname, Firstname, Password, FirebaseInstanceId.getInstance().getToken());
                     call.enqueue(new Callback<mainResponseObject>() {
                         @Override
                         public void onResponse(Call<mainResponseObject> call, Response<mainResponseObject> response) {
-                            Log.w(Tag, "Registered");
-                            AlertDialog alertDialog = new AlertDialog.Builder(RegisterActivity.this).create();
-                            alertDialog.setTitle("Registered succedd");
-                            alertDialog.setMessage("you registered successfully");
-                            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                                    new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            dialog.dismiss();
-                                        }
-                                    });
-                            alertDialog.show();
-                            finish();
+                            if (response.code() == 200) {
+                                Log.w(Tag, "Registered");
+                                AlertDialog alertDialog = new AlertDialog.Builder(RegisterActivity.this).create();
+                                alertDialog.setTitle("Registered succedd");
+                                alertDialog.setMessage("you registered successfully");
+                                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                                        new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                dialog.dismiss();
+                                            }
+                                        });
+                                alertDialog.show();
+                                finish();
+                            } else {
+                                Log.w(Tag, "Registered failed");
+                            }
                         }
 
                         @Override

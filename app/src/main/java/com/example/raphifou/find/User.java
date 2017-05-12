@@ -10,6 +10,7 @@ public class User {
     public String Login;
     public String Password;
     public String idFcm;
+    public String _id;
 
     public User(String FirstName, String Surname, String Login, String Password,String idFcm) {
         this.FirstName = FirstName;

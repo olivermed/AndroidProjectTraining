@@ -2,10 +2,15 @@ package com.example.raphifou.find;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.nfc.Tag;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -16,12 +21,32 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.example.raphifou.find.Fragment.ContactFragment;
+import com.example.raphifou.find.Retrofit.ApiBackend;
+import com.example.raphifou.find.Retrofit.BackEndApiService;
+import com.example.raphifou.find.Retrofit.mainResponseObject;
 import com.google.firebase.iid.FirebaseInstanceId;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.location.LocationProvider;
+
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener{
+
+    private LocationManager lm;
+
+    private double latitude;
+    private double longitude;
+    private double altitude;
+    private float accuracy;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +82,28 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        //Log.w(this.getPackageName(), FirebaseInstanceId.getInstance().getToken());
+        if (FirebaseInstanceId.getInstance().getToken() != null) {
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putString(getString(R.string.idFcm), FirebaseInstanceId.getInstance().getToken());
+            editor.commit();
+
+            Log.w(getPackageName(), "SharedPref added idFcm :: " + sharedPref.getString(getString(R.string.idFcm), null));
+
+            Log.w(this.getPackageName(), FirebaseInstanceId.getInstance().getToken());
+            BackEndApiService service = ApiBackend.getClient().create(BackEndApiService.class);
+            Call<mainResponseObject> call = service.addIdFcm(token, sharedPref.getString(getString(R.string.id), null), FirebaseInstanceId.getInstance().getToken());
+            call.enqueue(new Callback<mainResponseObject>() {
+                @Override
+                public void onResponse(Call<mainResponseObject> call, Response<mainResponseObject> response) {
+                    Log.w(getPackageName(), response.toString());
+                }
+
+                @Override
+                public void onFailure(Call<mainResponseObject> call, Throwable t) {
+                    Log.e(getPackageName(), t.toString());
+                }
+            });
+        }
     }
 
     @Override

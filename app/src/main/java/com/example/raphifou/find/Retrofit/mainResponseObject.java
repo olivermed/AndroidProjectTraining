@@ -10,7 +10,9 @@ public class mainResponseObject {
         String n;
     }
 
-    Results results;
+    public String message;
+
+    public Results results;
 
     public mainResponseObject getResult() {
         return this;

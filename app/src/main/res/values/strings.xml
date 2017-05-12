@@ -4,6 +4,13 @@
     <string name="login">login</string>
     <string name="password">password</string>
     <string name="token">token</string>
+    <string name="idFcm">idFcm</string>
+    <string name="sendingFcm">sendingFcm</string>
+    <string name="idUser">idUser</string>
+    <string name="loginUser">loginUser</string>
+    <string name="id">id</string>
+    <string name="provider_enabled">preference_file_key</string>
+    <string name="provider_disabled">preference_file_key</string>
     <string name="preference_file_key">preference_file_key</string>
     <string name="title_activity_main2">Main2Activity</string>
 
@@ -16,4 +23,6 @@
     <string name="second_cardview">Friends location</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_map">MapActivity</string>
+    <string name="title_activity_check_auth">CheckAuth</string>
 </resources>

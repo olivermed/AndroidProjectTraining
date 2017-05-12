@@ -14,6 +14,7 @@ import com.example.raphifou.find.Retrofit.ApiBackend;
 import com.example.raphifou.find.Retrofit.BackEndApiService;
 import com.example.raphifou.find.Retrofit.LoginObject;
 import com.example.raphifou.find.Retrofit.LoginResponse;
+import com.example.raphifou.find.Retrofit.UserResponse;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -43,7 +44,7 @@ public class Loginactivity extends AppCompatActivity {
         registerLink.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                Intent registerIntent = new Intent(Loginactivity.this,RegisterActivity.class);
+                Intent registerIntent = new Intent(Loginactivity.this, RegisterActivity.class);
                 Loginactivity.this.startActivity(registerIntent);
             }
         });
@@ -61,18 +62,22 @@ public class Loginactivity extends AppCompatActivity {
                     call.enqueue(new Callback<LoginResponse>() {
                         @Override
                         public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
-                            Log.w(Tag, response.body().toString());
-                            LoginResponse loginResponse = response.body().getResult();
-                            String token = loginResponse.token;
+                                Log.w(Tag, response.toString());
 
-                            if (token != null) {
-                                SharedPreferences.Editor editor = sharedPref.edit();
-                                editor.putString(getString(R.string.token), token);
-                                editor.putString(getString(R.string.password), txtPassword.getText().toString());
-                                editor.putString(getString(R.string.login), txtLogin.getText().toString());
-                                editor.commit();
-                                finish();
+                            if (response.code() == 200) {
+                                LoginResponse loginResponse = response.body().getResult();
+                                String token = loginResponse.token;
 
+                                if (token != null) {
+                                    SharedPreferences.Editor editor = sharedPref.edit();
+                                    editor.putString(getString(R.string.token), token);
+                                    editor.putString(getString(R.string.password), txtPassword.getText().toString());
+                                    editor.putString(getString(R.string.login), txtLogin.getText().toString());
+                                    editor.putString(getString(R.string.id), loginResponse._id);
+                                    editor.commit();
+
+                                    finish();
+                                }
                             }
                         }
 
