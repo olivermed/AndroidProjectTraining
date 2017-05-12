@@ -72,6 +72,7 @@ public class Loginactivity extends AppCompatActivity {
                                 editor.putString(getString(R.string.login), txtLogin.getText().toString());
                                 editor.commit();
                                 finish();
+
                             }
                         }
 

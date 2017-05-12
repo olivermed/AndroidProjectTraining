@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "420477793129",
+    "firebase_url": "https://trainingtest-c95e6.firebaseio.com",
+    "project_id": "trainingtest-c95e6",
+    "storage_bucket": "trainingtest-c95e6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:420477793129:android:8c78f2b8c19f1364",
+        "android_client_info": {
+          "package_name": "com.example.raphifou.find"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "420477793129-j2mjju65lnfedamlhgaqgdpm1n46v7ml.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAUTWXMttpxh1OxQZosvpXE_VUSIlC6poE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
