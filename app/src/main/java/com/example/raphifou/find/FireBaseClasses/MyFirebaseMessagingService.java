@@ -15,6 +15,7 @@ import com.example.raphifou.find.MainActivity;
 import com.example.raphifou.find.MapsActivity;
 import com.example.raphifou.find.R;
 import com.example.raphifou.find.Retrofit.FireBaseObject;
+import com.example.raphifou.find.ShareAskCache.AskCache;
 import com.firebase.jobdispatcher.FirebaseJobDispatcher;
 import com.firebase.jobdispatcher.GooglePlayDriver;
 import com.firebase.jobdispatcher.Job;
@@ -48,6 +49,13 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         // and data payloads are treated as notification messages. The Firebase console always sends notification
         // messages. For more see: https://firebase.google.com/docs/cloud-messaging/concept-options
         // [END_EXCLUDE]
+
+        SharedPreferences sharedPref = getSharedPreferences(
+                getString(R.string.preference_file_key), MODE_PRIVATE);
+        String token = sharedPref.getString(getString(R.string.token), null);
+        if (token == null) {
+            return;
+        }
 
         // TODO(developer): Handle FCM messages here.
         // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
@@ -129,13 +137,16 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             // Attempt to start an activity that can handle the Intent
             //mapIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
-            Log.w("Notification :: code 0", "Pending is lauching");
+            Log.w(getPackageName(), "Received location :: " + latitude + " || " + longitude);
 
             Intent mapIntent = new Intent(getApplication(), MapsActivity.class);
             mapIntent.putExtra(getString(R.string.latitude), latitude);
             mapIntent.putExtra(getString(R.string.longitude), longitude);
             pendingIntent = PendingIntent.getActivity(this, 0, mapIntent,
                     PendingIntent.FLAG_ONE_SHOT);
+            final FireBaseObject fireBaseObject = new FireBaseObject("", this.title, "", 1, "",idUser, this.title, latitude, longitude);
+            new AskCache(getApplicationContext()).addFireBaseObject(fireBaseObject);
+
         } else if (Integer.parseInt(flag) == 1) {
             Intent intent = new Intent(getApplication(), CheckAuth.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

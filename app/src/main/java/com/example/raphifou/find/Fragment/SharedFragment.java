@@ -1,61 +1,52 @@
 package com.example.raphifou.find.Fragment;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.example.raphifou.find.MainActivity;
 import com.example.raphifou.find.R;
-import com.example.raphifou.find.Retrofit.ApiBackend;
-import com.example.raphifou.find.Retrofit.BackEndApiService;
-import com.example.raphifou.find.Retrofit.LoginResponse;
-import com.example.raphifou.find.Retrofit.UsersResponse;
-import com.example.raphifou.find.User;
+import com.example.raphifou.find.Retrofit.FireBaseObject;
+import com.example.raphifou.find.ShareAskCache.ShareCache;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
-import static android.content.Context.MODE_PRIVATE;
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link ContactFragment.OnFragmentInteractionListener} interface
+ * {@link SharedFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link ContactFragment#newInstance} factory method to
+ * Use the {@link SharedFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ContactFragment extends Fragment {
+public class SharedFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    public static String Tag = ContactFragment.class.toString();
-    private static final String ARG_PARAM1 = "type";
+    public static String Tag = SharedFragment.class.toString();
+    private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
     // TODO: Rename and change types of parameters
-    private String type;
+    private String mParam1;
     private String mParam2;
+
+    private OnFragmentInteractionListener mListener;
 
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
-    private OnFragmentInteractionListener mListener;
+    View rootView;
 
-    public ContactFragment() {
+    public SharedFragment() {
         // Required empty public constructor
     }
 
@@ -63,15 +54,15 @@ public class ContactFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param type Parameter 1.
+     * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment ContactFragment.
+     * @return A new instance of fragment SharedFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static ContactFragment newInstance(String type, String param2) {
-        ContactFragment fragment = new ContactFragment();
+    public static SharedFragment newInstance(String param1, String param2) {
+        SharedFragment fragment = new SharedFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, type);
+        args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
@@ -81,7 +72,7 @@ public class ContactFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            type = getArguments().getString(ARG_PARAM1);
+            mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
@@ -90,43 +81,24 @@ public class ContactFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_contact, container, false);
-
-        mRecyclerView = (RecyclerView) view.findViewById(R.id.my_recycler_view);
+        rootView = inflater.inflate(R.layout.fragment_shared, container, false);
+        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.my_recycler_view);
+        ImageView img = (ImageView) rootView.findViewById(R.id.empty);
 
         mRecyclerView.setHasFixedSize(true);
 
         mLayoutManager = new LinearLayoutManager(getContext());
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        List<User> users = new ArrayList<>();
+        List<FireBaseObject> list = new ShareCache(getContext()).getFireBaseObjects();
 
-        SharedPreferences sharedPref = getActivity().getSharedPreferences(
-                getString(R.string.preference_file_key), MODE_PRIVATE);
-
-        String token = sharedPref.getString(getString(R.string.token), null);
-
-        final BackEndApiService service = ApiBackend.getClient().create(BackEndApiService.class);
-        Call<UsersResponse> call = service.getUsers(token);
-        call.enqueue(new Callback<UsersResponse>() {
-            @Override
-            public void onResponse(Call<UsersResponse> call, Response<UsersResponse> response) {
-                Log.w(Tag, response.body().getResults().toString());
-                List<User> usersList = response.body().getResults();
-                if (type != null) {
-                    mAdapter = new ContactList(usersList, getContext(), Integer.parseInt(type));
-                } else {
-                    mAdapter = new ContactList(usersList, getContext(), 0);
-                }
-                mRecyclerView.setAdapter(mAdapter);
-            }
-
-            @Override
-            public void onFailure(Call<UsersResponse> call, Throwable t) {
-
-            }
-        });
-        return view;
+        if (list != null) {
+            img.setVisibility(View.GONE);
+            mRecyclerView.setVisibility(View.VISIBLE);
+            mAdapter = new sharedAskAdapter(getContext(), list);
+            mRecyclerView.setAdapter(mAdapter);
+        }
+        return rootView;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -160,12 +132,15 @@ public class ContactFragment extends Fragment {
     }
 
     public void setAppBarMenu() {
-        ((MainActivity)getActivity()).setAppBarMenu(R.id.nav_contact);
-        getActivity().setTitle(getString(R.string.TitleContact));
-        if (Objects.equals(type, "1")) {
-            getActivity().setTitle("Share");
-        } else if (Objects.equals(type, "2")) {
-            getActivity().setTitle("Ask");
+        ((MainActivity)getActivity()).setAppBarMenu(R.id.nav_shared);
+        getActivity().setTitle(getString(R.string.TitleShared));
+    }
+
+    public void setViewEmpty() {
+        if (rootView != null) {
+            ImageView img = (ImageView) rootView.findViewById(R.id.empty);
+            mRecyclerView.setVisibility(View.GONE);
+            img.setVisibility(View.VISIBLE);
         }
     }
 

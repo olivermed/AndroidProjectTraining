@@ -16,6 +16,7 @@ import com.example.raphifou.find.Retrofit.ApiBackFireBase;
 import com.example.raphifou.find.Retrofit.BackEndApiService;
 import com.example.raphifou.find.Retrofit.FireBaseObject;
 import com.example.raphifou.find.Retrofit.FireBaseResponse;
+import com.example.raphifou.find.ShareAskCache.ShareCache;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -64,14 +65,16 @@ public class CheckAuth extends AppCompatActivity {
                 }
                 gps.stopUsingGPS();
 
+                final FireBaseObject fireBaseObject = new FireBaseObject(sendingFcm, login, "Here is the location of " + login, 0, idFcm, id, login, latitude, longitude);
                 BackEndApiService service = ApiBackFireBase.getClientFireBase().create(BackEndApiService.class);
                 Call<FireBaseResponse> call = service.sendMsgtToUser("application/json",
                         "key=AAAAYeZt82k:APA91bGQwNoUkZybkScveS_-koc2I6ySW9_9BXJBAKEN6t43Xs8S2diVxXp-5ERdYYSuj17QpUMc5rwINFDbjIyidzLYuw-2uNl5Qx1CSjrPqxFrDCPIzxCkxYSCBLg_5S5X6P4nCuXS",
-                        new FireBaseObject(sendingFcm, login, "Here is the location of " + login, 0, idFcm, id, login, latitude, longitude));
+                        fireBaseObject);
                 call.enqueue(new Callback<FireBaseResponse>() {
                     @Override
                     public void onResponse(Call<FireBaseResponse> call, Response<FireBaseResponse> response) {
                         Log.w(getPackageName(), response.toString());
+                        new  ShareCache(CheckAuth.this).addFireBaseObject(fireBaseObject);
                         finish();
                     }
 

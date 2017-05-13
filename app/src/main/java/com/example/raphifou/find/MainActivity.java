@@ -4,8 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -21,11 +20,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.example.raphifou.find.Fragment.AskFragment;
 import com.example.raphifou.find.Fragment.ContactFragment;
+import com.example.raphifou.find.Fragment.SharedFragment;
 import com.example.raphifou.find.GPS.GPSTracker;
 import com.example.raphifou.find.Retrofit.ApiBackend;
 import com.example.raphifou.find.Retrofit.BackEndApiService;
 import com.example.raphifou.find.Retrofit.mainResponseObject;
+import com.example.raphifou.find.ShareAskCache.ShareCache;
 import com.google.firebase.iid.FirebaseInstanceId;
 
 import retrofit2.Call;
@@ -181,12 +185,34 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_home) {
             setFragment(new Home(), Home.Tag);
         } else if (id == R.id.nav_disconnect) {
-            Intent intent = new Intent(this, Loginactivity.class);
-            startActivity(intent);
-        } else if (id == R.id.nav_share) {
+            new MaterialDialog.Builder(this)
+                    .title("Disconnect")
+                    .content("Do you want to disconnect ?")
+                    .positiveText("Yes")
+                    .negativeText("No")
+                    .onPositive(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                            SharedPreferences sharedPref = getSharedPreferences(
+                                    getString(R.string.preference_file_key), MODE_PRIVATE);
 
-        } else if (id == R.id.nav_send) {
+                            sharedPref.edit().remove(getString(R.string.token)).commit();
+                            Intent intent = new Intent(MainActivity.this, Loginactivity.class);
+                            startActivity(intent);
+                        }
+                    })
+                    .onNegative(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
 
+                        }
+                    })
+                    .show();
+
+        } else if (id == R.id.nav_shared) {
+            setFragment(new SharedFragment(), SharedFragment.Tag);
+        } else if (id == R.id.nav_sended) {
+            setFragment(new AskFragment(), AskFragment.Tag);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

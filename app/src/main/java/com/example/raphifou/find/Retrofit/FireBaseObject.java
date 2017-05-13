@@ -11,8 +11,8 @@ public class FireBaseObject {
 
     public class Data {
         public int flag = -1;
-        public String latitude = "0";
-        public String longitude = "0";
+        public String latitude;
+        public String longitude;
         public String idFcm;
         public String idUser;
         public String loginUser;

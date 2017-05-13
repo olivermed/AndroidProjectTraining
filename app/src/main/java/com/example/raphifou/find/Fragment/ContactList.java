@@ -17,13 +17,15 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
-import com.example.raphifou.find.CheckAuth;
+import com.example.raphifou.find.Cache.Cache;
 import com.example.raphifou.find.GPS.GPSTracker;
 import com.example.raphifou.find.R;
 import com.example.raphifou.find.Retrofit.ApiBackFireBase;
 import com.example.raphifou.find.Retrofit.BackEndApiService;
 import com.example.raphifou.find.Retrofit.FireBaseObject;
 import com.example.raphifou.find.Retrofit.FireBaseResponse;
+import com.example.raphifou.find.ShareAskCache.AskCache;
+import com.example.raphifou.find.ShareAskCache.ShareCache;
 import com.example.raphifou.find.User;
 
 import java.util.List;
@@ -45,11 +47,15 @@ public class ContactList extends RecyclerView.Adapter<ContactList.ViewHolder>  {
     int type = 0;
     public String longitude = null;
     public String latitude = null;
+    ShareCache shareCache = null;
+    AskCache askCache = null;
 
     public ContactList(List<User> users, Context context, int type) {
         this.users =  users;
         this.context = context;
         this.type = type;
+        shareCache = new ShareCache(context);
+        askCache = new AskCache(context);
     }
 
     @Override
@@ -77,6 +83,7 @@ public class ContactList extends RecyclerView.Adapter<ContactList.ViewHolder>  {
         if (gps.canGetLocation()){
             latitude = ""+gps.getLatitude(); // returns latitude
             longitude = ""+gps.getLongitude();
+            Log.w(context.getPackageName(), "Send location :: " + latitude + " || " + longitude);
         }
         gps.stopUsingGPS();
 
@@ -176,14 +183,16 @@ public class ContactList extends RecyclerView.Adapter<ContactList.ViewHolder>  {
     }
 
     public void shareToUser(final int position, String login, String idFcm) {
+        final FireBaseObject fireBaseObject = new FireBaseObject(users.get(position).idFcm, login, "Watch the location of " + login, 0, idFcm, users.get(position)._id, users.get(position).Login, latitude, longitude);
         BackEndApiService service = ApiBackFireBase.getClientFireBase().create(BackEndApiService.class);
         Call<FireBaseResponse> call = service.sendMsgtToUser("application/json",
                 "key=AAAAYeZt82k:APA91bGQwNoUkZybkScveS_-koc2I6ySW9_9BXJBAKEN6t43Xs8S2diVxXp-5ERdYYSuj17QpUMc5rwINFDbjIyidzLYuw-2uNl5Qx1CSjrPqxFrDCPIzxCkxYSCBLg_5S5X6P4nCuXS",
-                new FireBaseObject(users.get(position).idFcm, login, "Watch the location of " + login, 0, idFcm, users.get(position)._id, users.get(position).Login, latitude, longitude));
+                fireBaseObject);
         call.enqueue(new Callback<FireBaseResponse>() {
             @Override
             public void onResponse(Call<FireBaseResponse> call, Response<FireBaseResponse> response) {
                 Log.w(context.getPackageName(), response.toString());
+                shareCache.addFireBaseObject(fireBaseObject);
                 new MaterialDialog.Builder(context)
                         .title(users.get(position).Login)
                         .content("Your location have been shared with " + users.get(position).Login)
@@ -199,14 +208,16 @@ public class ContactList extends RecyclerView.Adapter<ContactList.ViewHolder>  {
     }
 
     public void askToUser(final int position, String login, String idFcm) {
+        final FireBaseObject fireBaseObject = new FireBaseObject(users.get(position).idFcm, login, "Share your location with " + login, 1, idFcm, users.get(position)._id, users.get(position).Login, latitude, longitude);
         BackEndApiService service = ApiBackFireBase.getClientFireBase().create(BackEndApiService.class);
         Call<FireBaseResponse> call = service.sendMsgtToUser("application/json",
                 "key=AAAAYeZt82k:APA91bGQwNoUkZybkScveS_-koc2I6ySW9_9BXJBAKEN6t43Xs8S2diVxXp-5ERdYYSuj17QpUMc5rwINFDbjIyidzLYuw-2uNl5Qx1CSjrPqxFrDCPIzxCkxYSCBLg_5S5X6P4nCuXS",
-                new FireBaseObject(users.get(position).idFcm, login, "Share your location with " + login, 1, idFcm, users.get(position)._id, users.get(position).Login, latitude, longitude));
+                fireBaseObject);
         call.enqueue(new Callback<FireBaseResponse>() {
             @Override
             public void onResponse(Call<FireBaseResponse> call, Response<FireBaseResponse> response) {
                 Log.w(context.getPackageName(), response.toString());
+                //askCache.addFireBaseObject(fireBaseObject);
                 new MaterialDialog.Builder(context)
                         .title(users.get(position).Login)
                         .content("You ask the location to " + users.get(position).Login)

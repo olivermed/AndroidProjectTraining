@@ -19,6 +19,8 @@
     <string name="ask_location_cardvoew_title">Friends location</string>
     <string name="TitleHome">Home</string>
     <string name="TitleContact">Contact</string>
+    <string name="TitleShared">Shared</string>
+    <string name="TitleAsked">Asked</string>
     <string name="UserName">UserName</string>
     <string name="UserSurname">UserSurname</string>
 

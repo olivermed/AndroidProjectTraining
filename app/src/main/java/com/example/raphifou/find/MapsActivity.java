@@ -1,5 +1,6 @@
 package com.example.raphifou.find;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -17,10 +18,16 @@ import com.google.android.gms.maps.model.MarkerOptions;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+    String longitude;
+    String latitude;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Intent intent = getIntent();
+        longitude = intent.getStringExtra(getString(R.string.longitude));
+        latitude = intent.getStringExtra(getString(R.string.latitude));
         setContentView(R.layout.activity_maps2);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -43,7 +50,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
         GPSTracker gps = new GPSTracker(this);
         if (gps.canGetLocation()){
-            LatLng location = new LatLng(gps.getLatitude(),  gps.getLongitude());
+            LatLng location = new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude));
             mMap.addMarker(new MarkerOptions().position(location).title("Location"));
             mMap.moveCamera(CameraUpdateFactory.newLatLng(location));
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 17));
