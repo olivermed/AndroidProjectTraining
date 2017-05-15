@@ -38,4 +38,6 @@
     <string name="title_activity_map">MapActivity</string>
     <string name="title_activity_check_auth">CheckAuth</string>
     <string name="title_activity_maps">Map</string>
+
+    <string name="url_api">https://apiprojecttraining.herokuapp.com/</string>
 </resources>

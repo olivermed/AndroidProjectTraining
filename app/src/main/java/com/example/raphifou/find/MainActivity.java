@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -29,7 +30,6 @@ import com.example.raphifou.find.GPS.GPSTracker;
 import com.example.raphifou.find.Retrofit.ApiBackend;
 import com.example.raphifou.find.Retrofit.BackEndApiService;
 import com.example.raphifou.find.Retrofit.mainResponseObject;
-import com.example.raphifou.find.ShareAskCache.ShareCache;
 import com.google.firebase.iid.FirebaseInstanceId;
 
 import retrofit2.Call;
@@ -40,55 +40,35 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final int MY_PERMISSIONS_REQUEST_READ_LOCATION = 0;
-    NavigationView navigationView = null;
+    private NavigationView navigationView = null;
+    private SharedPreferences sharedPref = null;
+    private Toolbar toolbar = null;
+    private FloatingActionButton fab = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
-        SharedPreferences sharedPref = getSharedPreferences(
+        sharedPref = getSharedPreferences(
                 getString(R.string.preference_file_key), MODE_PRIVATE);
 
+        setToolbar();
+        check_login();
+        check_permision();
+        setFirstView(savedInstanceState);
+        set_drawer();
+        updateFcmId();
+    }
+
+    public void setToolbar() {
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+    }
+
+    public void updateFcmId() {
         String token = sharedPref.getString(getString(R.string.token), null);
-        if (token == null) {
-            Intent intent = new Intent(this, Loginactivity.class);
-            startActivity(intent);
-        }
-
-        if (ContextCompat.checkSelfPermission(this,
-                android.Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-
-                // No explanation needed, we can request the permission.
-                ActivityCompat.requestPermissions(this,
-                        new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
-                        MY_PERMISSIONS_REQUEST_READ_LOCATION);
-        }
-
-        if(savedInstanceState == null) {
-            Fragment home = Home.newInstance(null, null);
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, home, home.getTag())
-                    .addToBackStack(home.getTag())
-                    .commit();
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-        navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
-        View headerLayout = navigationView.getHeaderView(0);
-        TextView txtUserName = (TextView) headerLayout.findViewById(R.id.txtUserName);
-        txtUserName.setText(sharedPref.getString(getString(R.string.login), null));
-
         if (FirebaseInstanceId.getInstance().getToken() != null) {
             SharedPreferences.Editor editor = sharedPref.edit();
             editor.putString(getString(R.string.idFcm), FirebaseInstanceId.getInstance().getToken());
@@ -113,6 +93,53 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    public void set_drawer() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        View headerLayout = navigationView.getHeaderView(0);
+        TextView txtUserName = (TextView) headerLayout.findViewById(R.id.txtUserName);
+        txtUserName.setText(sharedPref.getString(getString(R.string.login), null));
+    }
+
+    public void setFirstView(Bundle savedInstanceState) {
+        if (savedInstanceState == null) {
+            Fragment home = Home.newInstance(null, null);
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, home, home.getTag())
+                    .addToBackStack(home.getTag())
+                    .commit();
+            fab = (FloatingActionButton) findViewById(R.id.fab);
+            fab.hide();
+        }
+    }
+
+    public void check_login() {
+        String token = sharedPref.getString(getString(R.string.token), null);
+        if (token == null) {
+            Intent intent = new Intent(this, Loginactivity.class);
+            startActivity(intent);
+        }
+    }
+
+    public void check_permision() {
+        if (ContextCompat.checkSelfPermission(this,
+                android.Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // No explanation needed, we can request the permission.
+            ActivityCompat.requestPermissions(this,
+                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                    MY_PERMISSIONS_REQUEST_READ_LOCATION);
+        }
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
@@ -123,7 +150,7 @@ public class MainActivity extends AppCompatActivity
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
                     GPSTracker gps = new GPSTracker(this);
-                    if (gps.canGetLocation()){
+                    if (gps.canGetLocation()) {
                         gps.getLatitude(); // returns latitude
                         gps.getLongitude();
                     }
@@ -155,7 +182,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main2, menu);
+        getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
@@ -185,30 +212,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_home) {
             setFragment(new Home(), Home.Tag);
         } else if (id == R.id.nav_disconnect) {
-            new MaterialDialog.Builder(this)
-                    .title("Disconnect")
-                    .content("Do you want to disconnect ?")
-                    .positiveText("Yes")
-                    .negativeText("No")
-                    .onPositive(new MaterialDialog.SingleButtonCallback() {
-                        @Override
-                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                            SharedPreferences sharedPref = getSharedPreferences(
-                                    getString(R.string.preference_file_key), MODE_PRIVATE);
-
-                            sharedPref.edit().remove(getString(R.string.token)).commit();
-                            Intent intent = new Intent(MainActivity.this, Loginactivity.class);
-                            startActivity(intent);
-                        }
-                    })
-                    .onNegative(new MaterialDialog.SingleButtonCallback() {
-                        @Override
-                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-
-                        }
-                    })
-                    .show();
-
+            askDisconnect();
         } else if (id == R.id.nav_shared) {
             setFragment(new SharedFragment(), SharedFragment.Tag);
         } else if (id == R.id.nav_sended) {
@@ -218,6 +222,32 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    public void askDisconnect() {
+        new MaterialDialog.Builder(this)
+                .title("Disconnect")
+                .content("Do you want to disconnect ?")
+                .positiveText("Yes")
+                .negativeText("No")
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        SharedPreferences sharedPref = getSharedPreferences(
+                                getString(R.string.preference_file_key), MODE_PRIVATE);
+
+                        sharedPref.edit().remove(getString(R.string.token)).commit();
+                        Intent intent = new Intent(MainActivity.this, Loginactivity.class);
+                        startActivity(intent);
+                    }
+                })
+                .onNegative(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+
+                    }
+                })
+                .show();
     }
 
     public void setFragment(Fragment fragment, String Tag) {
@@ -244,5 +274,15 @@ public class MainActivity extends AppCompatActivity
 
     public void setAppBarMenu(int id) {
         navigationView.setCheckedItem(id);
+    }
+
+    public void showFab(int idDrawable, View.OnClickListener listener) {
+        fab.show();
+        fab.setImageResource(idDrawable);
+        fab.setOnClickListener(listener);
+    }
+
+    public void hideFab() {
+        fab.hide();
     }
 }

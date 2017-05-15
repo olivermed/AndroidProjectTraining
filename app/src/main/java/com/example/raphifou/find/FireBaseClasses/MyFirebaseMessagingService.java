@@ -13,6 +13,7 @@ import android.util.Log;
 import com.example.raphifou.find.CheckAuth;
 import com.example.raphifou.find.MainActivity;
 import com.example.raphifou.find.MapsActivity;
+import com.example.raphifou.find.MyUtilities.MyUtilities;
 import com.example.raphifou.find.R;
 import com.example.raphifou.find.Retrofit.FireBaseObject;
 import com.example.raphifou.find.ShareAskCache.AskCache;
@@ -22,6 +23,9 @@ import com.firebase.jobdispatcher.Job;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.google.gson.Gson;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by oliviermedec on 09/05/2017.
@@ -64,14 +68,28 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         if (remoteMessage.getData().size() > 0) {
             Log.d(TAG, "Message data payload: " + remoteMessage.getData());
 
-            latitude = remoteMessage.getData().get("latitude").toString();
-            longitude = remoteMessage.getData().get("longitude").toString();
-            flag = remoteMessage.getData().get("flag").toString();
-            sendingFcm = remoteMessage.getData().get("idFcm").toString();
-            idUser = remoteMessage.getData().get("idUser").toString();
-            loginUser = remoteMessage.getData().get("loginUser").toString();
-            title = remoteMessage.getData().get("title").toString();
-            body = remoteMessage.getData().get("body").toString();
+            latitude = remoteMessage.getData().get("latitude");
+            longitude = remoteMessage.getData().get("longitude");
+            flag = remoteMessage.getData().get("flag");
+            sendingFcm = remoteMessage.getData().get("idFcm");
+            idUser = remoteMessage.getData().get("idUser");
+            loginUser = remoteMessage.getData().get("loginUser");
+            title = remoteMessage.getData().get("title");
+            body = remoteMessage.getData().get("body");
+
+            List<Object> list = new ArrayList<>();
+            list.add(latitude);
+            list.add(longitude);
+            list.add(flag);
+            list.add(sendingFcm);
+            list.add(idUser);
+            list.add(loginUser);
+            list.add(title);
+            list.add(body);
+
+            if (!new MyUtilities().checkIfObjectsNull(list)) { // One of the element of the list is null
+                return;
+            }
 
             if (/* Check if data needs to be processed by long running job */ true) {
                 // For long-running tasks (10 seconds or more) use Firebase Job Dispatcher.
@@ -126,16 +144,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     private void sendNotification(String messageBody, String title) {
         PendingIntent pendingIntent = null;
         if (Integer.parseInt(flag) == 0) {
-            // Create a Uri from an intent string. Use the result to create an Intent.
-            //Uri gmmIntentUri = Uri.parse("geo:0,0?q=" + latitude + "," + longitude);
-
-            // Create an Intent from gmmIntentUri. Set the action to ACTION_VIEW
-            //Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-            // Make the Intent explicit by setting the Google Maps package
-            //mapIntent.setPackage("com.google.android.apps.maps");
-
-            // Attempt to start an activity that can handle the Intent
-            //mapIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
             Log.w(getPackageName(), "Received location :: " + latitude + " || " + longitude);
 
@@ -144,7 +152,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             mapIntent.putExtra(getString(R.string.longitude), longitude);
             pendingIntent = PendingIntent.getActivity(this, 0, mapIntent,
                     PendingIntent.FLAG_ONE_SHOT);
-            final FireBaseObject fireBaseObject = new FireBaseObject("", this.title, "", 1, "",idUser, this.title, latitude, longitude);
+            final FireBaseObject fireBaseObject = new FireBaseObject("", this.title, "", 0, "",idUser, this.title, latitude, longitude);
             new AskCache(getApplicationContext()).addFireBaseObject(fireBaseObject);
 
         } else if (Integer.parseInt(flag) == 1) {

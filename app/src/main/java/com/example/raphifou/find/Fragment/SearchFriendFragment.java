@@ -4,23 +4,31 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.example.raphifou.find.R;
+import com.example.raphifou.find.User;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link MapFragment.OnFragmentInteractionListener} interface
+ * {@link SearchFriendFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link MapFragment#newInstance} factory method to
+ * Use the {@link SearchFriendFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MapFragment extends Fragment {
+public class SearchFriendFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+    public static String Tag = SearchFriendFragment.class.toString();
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
@@ -28,9 +36,13 @@ public class MapFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
+    private RecyclerView mRecyclerView;
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
+
     private OnFragmentInteractionListener mListener;
 
-    public MapFragment() {
+    public SearchFriendFragment() {
         // Required empty public constructor
     }
 
@@ -40,11 +52,11 @@ public class MapFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment MapFragment.
+     * @return A new instance of fragment SearchFriendFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static MapFragment newInstance(String param1, String param2) {
-        MapFragment fragment = new MapFragment();
+    public static SearchFriendFragment newInstance(String param1, String param2) {
+        SearchFriendFragment fragment = new SearchFriendFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -65,7 +77,19 @@ public class MapFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_map, container, false);
+        View rootview = inflater.inflate(R.layout.fragment_search_friend, container, false);
+        mRecyclerView = (RecyclerView) rootview.findViewById(R.id.my_recycler_view);
+        mRecyclerView.setHasFixedSize(true);
+        mLayoutManager = new LinearLayoutManager(getContext());
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        ProgressBar progressBarFriends = (ProgressBar) rootview.findViewById(R.id.progressBarFriends);
+        progressBarFriends.setVisibility(View.GONE);
+        List<User> usersList = new ArrayList<>();
+        usersList.add(new User("Olivier", "Medec", "OlivierMedec", "test", "idFcm"));
+
+        mAdapter = new ContactList(usersList, getContext(), 3);
+        mRecyclerView.setAdapter(mAdapter);
+        return rootview;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -73,17 +97,6 @@ public class MapFragment extends Fragment {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
         }
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        /*if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }*/
     }
 
     @Override

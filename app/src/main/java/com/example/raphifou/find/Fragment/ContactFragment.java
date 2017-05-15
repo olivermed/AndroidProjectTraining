@@ -11,15 +11,21 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 
+import com.example.raphifou.find.Home;
 import com.example.raphifou.find.MainActivity;
 import com.example.raphifou.find.R;
+import com.example.raphifou.find.Resquest.MyResquestor;
 import com.example.raphifou.find.Retrofit.ApiBackend;
 import com.example.raphifou.find.Retrofit.BackEndApiService;
 import com.example.raphifou.find.Retrofit.LoginResponse;
 import com.example.raphifou.find.Retrofit.UsersResponse;
 import com.example.raphifou.find.User;
+import com.futuremind.recyclerviewfastscroll.FastScroller;
 
+import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -52,6 +58,8 @@ public class ContactFragment extends Fragment {
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
+    private FastScroller fastScroller;
+    private ProgressBar progressBarFriends;
 
     private OnFragmentInteractionListener mListener;
 
@@ -91,16 +99,25 @@ public class ContactFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_contact, container, false);
-
+        fastScroller = (FastScroller) view.findViewById(R.id.fastscroll);
+        progressBarFriends = (ProgressBar) view.findViewById(R.id.progressBar3);
         mRecyclerView = (RecyclerView) view.findViewById(R.id.my_recycler_view);
-
         mRecyclerView.setHasFixedSize(true);
-
         mLayoutManager = new LinearLayoutManager(getContext());
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        List<User> users = new ArrayList<>();
+        getContacts();
 
+        List<User> usersList = new ArrayList<>();               /* Solution temporaire pour la scroll view */
+        usersList.add(new User("", "", "", "", ""));
+        mAdapter = new ContactList(usersList, getContext(), 0);
+        mRecyclerView.setAdapter(mAdapter);
+        fastScroller.setRecyclerView(mRecyclerView);
+
+        return view;
+    }
+
+    private void getContacts() {
         SharedPreferences sharedPref = getActivity().getSharedPreferences(
                 getString(R.string.preference_file_key), MODE_PRIVATE);
 
@@ -119,6 +136,9 @@ public class ContactFragment extends Fragment {
                     mAdapter = new ContactList(usersList, getContext(), 0);
                 }
                 mRecyclerView.setAdapter(mAdapter);
+                fastScroller.setRecyclerView(mRecyclerView);
+                progressBarFriends.setVisibility(View.GONE);
+                mRecyclerView.setVisibility(View.VISIBLE);
             }
 
             @Override
@@ -126,7 +146,6 @@ public class ContactFragment extends Fragment {
 
             }
         });
-        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -139,12 +158,6 @@ public class ContactFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        /*if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }*/
     }
 
     @Override
@@ -157,6 +170,19 @@ public class ContactFragment extends Fragment {
     public void onResume() {
         super.onResume();
         setAppBarMenu();
+        ((MainActivity)getContext()).showFab(R.drawable.ic_add, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Fragment searchFriend = new SearchFriendFragment();
+                ((MainActivity)getContext()).setFragment(searchFriend, SearchFriendFragment.Tag);
+            }
+        });
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        ((MainActivity)getContext()).hideFab();
     }
 
     public void setAppBarMenu() {

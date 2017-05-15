@@ -27,6 +27,7 @@ import com.example.raphifou.find.Retrofit.FireBaseResponse;
 import com.example.raphifou.find.ShareAskCache.AskCache;
 import com.example.raphifou.find.ShareAskCache.ShareCache;
 import com.example.raphifou.find.User;
+import com.futuremind.recyclerviewfastscroll.SectionTitleProvider;
 
 import java.util.List;
 
@@ -40,7 +41,7 @@ import static android.content.Context.MODE_PRIVATE;
  * Created by oliviermedec on 11/05/2017.
  */
 
-public class ContactList extends RecyclerView.Adapter<ContactList.ViewHolder>  {
+public class ContactList extends RecyclerView.Adapter<ContactList.ViewHolder> implements SectionTitleProvider {
     List<User> users = null;
     Context context = null;
     ColorGenerator generator = ColorGenerator.MATERIAL;
@@ -60,7 +61,7 @@ public class ContactList extends RecyclerView.Adapter<ContactList.ViewHolder>  {
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        CardView v = (CardView) LayoutInflater.from(parent.getContext())
+        RelativeLayout v = (RelativeLayout) LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.list_bubble_text, parent, false);
         ViewHolder vh = new ViewHolder(v);
         return vh;
@@ -70,7 +71,7 @@ public class ContactList extends RecyclerView.Adapter<ContactList.ViewHolder>  {
     public void onBindViewHolder(ViewHolder holder, final int position) {
         holder.mTextView.setText(users.get(position).Login);
         TextDrawable drawable = TextDrawable.builder()
-                .buildRound(String.valueOf(users.get(position).Login.charAt(0)),
+                .buildRound(String.valueOf(users.get(position).Login.toUpperCase().charAt(0)),
                         generator.getColor(users.get(position).Login));
         holder.imgBubble.setImageDrawable(drawable);
 
@@ -78,6 +79,8 @@ public class ContactList extends RecyclerView.Adapter<ContactList.ViewHolder>  {
                 context.getString(R.string.preference_file_key), MODE_PRIVATE);
         final String login = sharedPref.getString(context.getString(R.string.login), null);
         final String idFcm = sharedPref.getString(context.getString(R.string.idFcm), null);
+
+        holder.txtUserName.setText(users.get(position).FirstName + " " + users.get(position).LastName);
 
         GPSTracker gps = new GPSTracker(context);
         if (gps.canGetLocation()){
@@ -176,7 +179,25 @@ public class ContactList extends RecyclerView.Adapter<ContactList.ViewHolder>  {
                                 }
                             })
                             .show();
+                } else if (type == 3) { // Add Friend
+                    new MaterialDialog.Builder(context)
+                            .title("Friend request")
+                            .content("Do you want to send to " + users.get(position).Login + " a friend request ?")
+                            .positiveText("Yes")
+                            .negativeText("No")
+                            .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
 
+                                }
+                            })
+                            .onNegative(new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+
+                                }
+                            })
+                            .show();
                 }
             }
         });
@@ -237,13 +258,20 @@ public class ContactList extends RecyclerView.Adapter<ContactList.ViewHolder>  {
         return users.size();
     }
 
+    @Override
+    public String getSectionTitle(int position) {
+        return users.get(position).LastName.substring(0, 1);
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
         public TextView mTextView;
+        public TextView txtUserName;
         public ImageView imgBubble;
         public RelativeLayout container;
         public ViewHolder(View itemView) {
             super(itemView);
             mTextView = (TextView)itemView.findViewById(R.id.txtLogin);
+            txtUserName = (TextView)itemView.findViewById(R.id.txtUserName);
             imgBubble = (ImageView)itemView.findViewById(R.id.image_view);
             container = (RelativeLayout)itemView.findViewById(R.id.container);
         }

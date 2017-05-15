@@ -52,8 +52,10 @@ dependencies {
     compile 'com.afollestad.material-dialogs:commons:0.9.4.4'
     compile 'com.google.android.gms:play-services-maps:10.2.4'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.6.3'
+    compile 'com.futuremind.recyclerfastscroll:fastscroll:0.2.5'
     testCompile 'junit:junit:4.12'
 }
+
 
 
 
